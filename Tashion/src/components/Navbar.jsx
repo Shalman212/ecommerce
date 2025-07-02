@@ -1,16 +1,17 @@
 import React, { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
 
 const Navbar = () => {
     const [visible, setVisible] = useState(false);
     const { setShowSearch } = useContext(ShopContext);
+    const navigate = useNavigate();
+
     return (
         <div className='flex items-center justify-between py-5 font-medium'>
             <Link to='/'><img src={assets.logo} style={{ width: '80px' }} alt="" /></Link>
             <ul className='hidden laptop:flex gap-5 text-sm text-gray-700'>
-
                 <NavLink to='/' className='flex flex-col items-center gap-1 text-gray-700 no-underline'>
                     <p>HOME</p>
                     <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
@@ -27,10 +28,17 @@ const Navbar = () => {
                     <p>CONTACT</p>
                     <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
                 </NavLink>
-
             </ul>
             <div className='flex items-center gap-6'>
                 <img onClick={() => setShowSearch(true)} src={assets.search_icon} className='w-5 cursor-pointer hover:scale-110 transition-transform duration-200' alt="" />
+                {/* LOGIN BUTTON ONLY */}
+                <button
+                    onClick={() => navigate("/login")}
+                    className="px-4 py-1 bg-black text-white rounded hover:bg-gray-900 transition hidden laptop:block"
+                >
+                    Login
+                </button>
+                {/* Profile Dropdown */}
                 <div className='group relative'>
                     <img
                         className='w-5 cursor-pointer hover:scale-110 transition-transform duration-200'
@@ -49,7 +57,6 @@ const Navbar = () => {
                     <img src={assets.cart_icon} className='w-5 min-w-5' alt="" />
                     <p className='absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>10</p></Link>
                 <img onClick={() => setVisible(true)} src={assets.menu_icon} className='w-5 cursor-pointer block laptop:hidden' alt="" />
-
             </div>
             {/*Sidebar menu for small screens*/}
             <div className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${visible ? 'w-full' : 'w-0'}`}>
@@ -62,9 +69,15 @@ const Navbar = () => {
                     <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/collection'>COLLECTION</NavLink>
                     <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/about'>ABOUT</NavLink>
                     <NavLink onClick={() => setVisible(false)} className='py-2 pl-6 border' to='/contact'>CONTACT</NavLink>
+                    {/* LOGIN BUTTON FOR MOBILE */}
+                    <button
+                        onClick={() => { setVisible(false); navigate("/login"); }}
+                        className="py-2 pl-6 border text-left"
+                    >
+                        Login
+                    </button>
                 </div>
             </div>
-
         </div>
     )
 }
