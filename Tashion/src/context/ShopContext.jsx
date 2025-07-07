@@ -1,5 +1,5 @@
-import React, { createContext, useState } from "react";
-import { products } from "../assets/assets";
+import React, { createContext, useState, useEffect } from "react";
+import { products as localProducts } from "../assets/assets"; // your static/demo products
 
 export const ShopContext = createContext();
 
@@ -9,8 +9,26 @@ export const ShopContextProvider = (props) => {
     const [search, setSearch] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState({});
+    const [products, setProducts] = useState(localProducts);
 
-    // Add product with specific size to cart (or increase quantity)
+    useEffect(() => {
+        // Fetch backend products and combine with local ones
+        fetch("http://localhost:5000/api/products")
+            .then(res => res.json())
+            .then(data => {
+                // Merge local and backend products (no duplicates by _id)
+                const merged = [...localProducts];
+                data.forEach(apiProduct => {
+                    if (!merged.some(lp => lp._id === apiProduct._id)) {
+                        merged.push(apiProduct);
+                    }
+                });
+                setProducts(merged);
+            })
+            .catch(() => setProducts(localProducts)); // fallback if backend fails
+    }, []);
+
+    // ---- Cart logic remains the same ----
     const addToCart = (itemId, size) => {
         if (!size) return;
         let cartData = structuredClone(cartItems);
@@ -27,12 +45,10 @@ export const ShopContextProvider = (props) => {
         setCartItems(cartData);
     };
 
-    // Remove a product/size combo from cart
     const removeFromCart = (itemId, size) => {
         let cartData = structuredClone(cartItems);
         if (cartData[itemId]) {
             delete cartData[itemId][size];
-            // If all sizes for this product are removed, remove the productId key too
             if (Object.keys(cartData[itemId]).length === 0) {
                 delete cartData[itemId];
             }
@@ -40,7 +56,6 @@ export const ShopContextProvider = (props) => {
         setCartItems(cartData);
     };
 
-    // Update quantity for a given product/size (set to newQuantity, or remove if <= 0)
     const updateCartQuantity = (itemId, size, newQuantity) => {
         let cartData = structuredClone(cartItems);
         if (cartData[itemId] && cartData[itemId][size]) {

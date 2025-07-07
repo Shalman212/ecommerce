@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const OrderSchema = new mongoose.Schema({
+
+const OrdersSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     items: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
@@ -11,4 +12,5 @@ const OrderSchema = new mongoose.Schema({
     status: { type: String, default: 'Processing' },
     createdAt: { type: Date, default: Date.now }
 });
-module.exports = mongoose.model('Order', OrderSchema);
+
+module.exports = mongoose.model('Orders', OrdersSchema);

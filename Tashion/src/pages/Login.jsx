@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-// Demo users for login (replace with backend/users db for real app)
-const dummyUsers = [
-  { email: "admin@tashion.com", password: "admin123", role: "admin" },
-  { email: "user@tashion.com", password: "user123", role: "member" },
-];
-
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -18,23 +12,36 @@ const Login = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = dummyUsers.find(
-      (u) => u.email === form.email && u.password === form.password
-    );
-    if (user) {
-      login(user); // Save user info to context
-      setError("");
-      if (user.role === "admin") {
+    setError("");
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Login failed");
+
+      console.log("Login token:", data.token);  // Debug: check token value
+
+      localStorage.setItem("token", data.token);
+      console.log("Token saved to localStorage:", localStorage.getItem("token"));
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      login(data.user);
+
+      if (data.user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/member");
       }
-    } else {
-      setError("Invalid email or password!");
+    } catch (err) {
+      setError(err.message || "Invalid email or password!");
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">

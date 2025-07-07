@@ -1,5 +1,6 @@
 import React from 'react'
 import { Route, Routes, Navigate } from 'react-router-dom'
+
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import About from './pages/About'
@@ -7,7 +8,7 @@ import Cart from './pages/Cart'
 import Contact from './pages/Contact'
 import Product from './pages/Product'
 import Login from './pages/Login'
-import Register from './pages/Register'    // <-- new
+import Register from './pages/Register'
 import PlaceOrder from './pages/PlaceOrder'
 import Orders from './pages/Orders'
 import MemberPage from './pages/MemberPage'
@@ -17,8 +18,9 @@ import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { AuthProvider } from "./context/AuthContext";
-import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./context/AuthContext"
+import PrivateRoute from "./components/PrivateRoute"
+import AddProduct from "./pages/AddProduct";
 
 const App = () => {
   return (
@@ -27,6 +29,7 @@ const App = () => {
         <ToastContainer />
         <Navbar />
         <SearchBar />
+
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/collection' element={<Collection />} />
@@ -38,6 +41,8 @@ const App = () => {
           <Route path='/register' element={<Register />} />
           <Route path='/place-order' element={<PlaceOrder />} />
           <Route path='/orders' element={<Orders />} />
+
+          {/* Protected Member Route */}
           <Route
             path='/member'
             element={
@@ -46,6 +51,8 @@ const App = () => {
               </PrivateRoute>
             }
           />
+
+          {/* Protected Admin Route */}
           <Route
             path='/admin'
             element={
@@ -54,6 +61,18 @@ const App = () => {
               </PrivateRoute>
             }
           />
+
+          {/* Add Product (Admin only) */}
+          <Route
+            path='/admin/add-product'
+            element={
+              <PrivateRoute role="admin">
+                <AddProduct />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Fallback: redirect unknown routes to home */}
           <Route path='*' element={<Navigate to='/' />} />
         </Routes>
         <Footer />
